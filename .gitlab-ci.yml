@@ -1,0 +1,13 @@
+variables:
+  BUILD_CONFIGURATION: 'Release'
+  BUILD_TARGET: './R365.Sync.Proxy.sln'
+  VERSION_PART_MAJOR: '1'
+  VERSION_PART_MINOR: '8'
+  VERSION_PART_PATCH: '10'
+
+include:
+  - project: 'Compeat/devops/gitlab-templates'
+    ref: henk
+    file: 'nuget.yaml'
+
+image: mcr.microsoft.com/dotnet/sdk:6.0
