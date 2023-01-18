@@ -3,7 +3,7 @@ variables:
   BUILD_TARGET: './R365.Sync.Proxy.sln'
   VERSION_PART_MAJOR: '1'
   VERSION_PART_MINOR: '8'
-  VERSION_PART_PATCH: '10'
+  VERSION_PART_PATCH: '11'
 
 include:
   - project: 'Compeat/devops/gitlab-templates'
