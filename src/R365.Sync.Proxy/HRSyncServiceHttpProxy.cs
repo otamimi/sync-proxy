@@ -11,11 +11,6 @@ namespace R365.Sync.Proxy
     public class HRSyncServiceHttpProxy : IHRSyncServiceHttpProxy
     {
         private readonly HttpClient _httpClient;
-        private readonly ICachingService<List<Location>> _locationsCache;
-        private readonly ICachingService<List<Employee>> _employeeCache;
-        private readonly ICachingService<List<Job>> _jobCache;
-        private readonly CachePolicy _defaultCachePolicy;
-        private readonly CachePolicy _employeeCachePolicy;
         private readonly IContext _context;
 
         /// <summary>
@@ -35,11 +30,6 @@ namespace R365.Sync.Proxy
         {
             this._httpClient          = httpClient.EnrichHttpClient(context);
             this._context             = context;
-            this._locationsCache      = locationsCache;
-            this._employeeCache       = employeeCache;
-            this._jobCache            = jobCache;
-            this._defaultCachePolicy  = new CachePolicy(new CacheTier(CacheType.LocalVolatile, 900));
-            this._employeeCachePolicy = new CachePolicy(new CacheTier(CacheType.LocalVolatile, 3600));
 
         }
 
@@ -49,22 +39,18 @@ namespace R365.Sync.Proxy
         /// <param name="providerName"></param>
         /// <param name="location"></param>
         /// <returns></returns>
-        public async Task<List<Employee>> GetProviderEmployeesAsync(string providerName, string location)
+        public async Task<List<Employee>> GetProviderEmployeesAsync(string providerName, IEnumerable<string> location)
         {
-            var employees = await this._employeeCache.Get(this._context.GetTenantId() + providerName + location, async (key) =>
+
+            var response = await this
+                                 ._httpClient.EnrichHttpClient(_context)
+                                 .GetAsync($"hr/{providerName}/employee/{location}");
+            if (!response.IsSuccessStatusCode)
             {
-                var response = await this
-                                     ._httpClient.EnrichHttpClient(_context)
-                                     .GetAsync($"hr/{providerName}/employee/{location}");
-                if (!response.IsSuccessStatusCode)
-                {
-                    await Utils.ThrowExceptionForNonSuccessResponseAsync(response);
-                }
+                await Utils.ThrowExceptionForNonSuccessResponseAsync(response);
+            }
 
-                return await response.Content.ReadAsAsync<List<Employee>>();
-            }, this._employeeCachePolicy);
-
-            return employees;
+            return await response.Content.ReadAsAsync<List<Employee>>();
         }
 
         /// <summary>

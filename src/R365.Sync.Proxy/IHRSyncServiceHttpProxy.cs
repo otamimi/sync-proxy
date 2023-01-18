@@ -12,7 +12,7 @@ namespace R365.Sync.Proxy
         /// <param name="providerName"></param>
         /// <param name="location"></param>
         /// <returns></returns>
-        Task<List<Employee>> GetProviderEmployeesAsync(string providerName, string location);
+        Task<List<Employee>> GetProviderEmployeesAsync(string providerName, IEnumerable<string> location);
 
         /// <summary>
         /// Get a list of all Jobs within the given provider
